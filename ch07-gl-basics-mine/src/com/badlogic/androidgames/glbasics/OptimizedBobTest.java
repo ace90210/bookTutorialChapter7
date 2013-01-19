@@ -10,7 +10,7 @@ import com.badlogic.androidgames.framework.impl.GLGame;
 import com.badlogic.androidgames.framework.impl.GLGraphics;
 import com.badlogic.androidgames.framework.gl.FPSCounter;
 
-public class BobTest extends GLGame 
+public class OptimizedBobTest extends GLGame 
 {
 	public Screen getStartScreen()
 	{
@@ -30,7 +30,7 @@ public class BobTest extends GLGame
             super(game);
             glGraphics = ((GLGame)game).getGLGraphics();
 			
-			bobTexture = new Texture((GLGame)game, "bobrgb888.png");
+			bobTexture = new Texture((GLGame)game, "bobrgb888-32x32.png");
 			
 			bobModel = new Vertices(glGraphics, 4, 12, false, true);
 			bobModel.setVertices(new float[] { 
@@ -66,39 +66,41 @@ public class BobTest extends GLGame
 		public void present(float deltaTime)
 		{
 			GL10 gl = glGraphics.getGL();
-			gl.glViewport(0, 0, glGraphics.getWidth(), glGraphics.getHeight());
-			gl.glClearColor(1, 0, 0, 1);
 			gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-			gl.glMatrixMode(GL10.GL_PROJECTION);
-			gl.glLoadIdentity();
-			gl.glOrthof(0, 320, 0, 480, 1, -1);
-			gl.glEnable(GL10.GL_TEXTURE_2D);
-			bobTexture.bind();
 			
-			gl.glMatrixMode(GL10.GL_MODELVIEW);
+			bobModel.bind();
 			for(int i = 0; i < NUM_BOBS; i++)
 			{
 				gl.glLoadIdentity();
 				gl.glTranslatef(bobs[i].x, bobs[i].y, 0);
 				gl.glRotatef(45, 0, 0, 1);
 				gl.glScalef(2, 0.5f, 1);
-				bobModel.draw(GL10.GL_TRIANGLES, 0, 6);
+				bobModel.drawOptimal(GL10.GL_TRIANGLES, 0, 6);
 			}
+			bobModel.unbind();
+			
 			fps.logFrame();
 		}
 
 
 		@Override
 		public void pause() {
-			// TODO Auto-generated method stub
 			
 		}
 
 
 		@Override
 		public void resume() {
-			// TODO Auto-generated method stub
-			
+			GL10 gl = glGraphics.getGL();
+			gl.glViewport(0, 0, glGraphics.getWidth(), glGraphics.getHeight());
+			gl.glClearColor(1, 0, 0, 1);
+			gl.glMatrixMode(GL10.GL_PROJECTION);
+			gl.glLoadIdentity();
+			gl.glOrthof(0, 320, 0, 480, 1, -1);
+			bobTexture.reload();
+			gl.glEnable(GL10.GL_TEXTURE_2D);
+			bobTexture.bind();
+			gl.glMatrixMode(GL10.GL_MODELVIEW);
 		}
 
 

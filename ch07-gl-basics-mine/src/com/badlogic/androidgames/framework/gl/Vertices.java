@@ -104,6 +104,42 @@ public class Vertices {
 		this.indices.flip();
 	}
 	
+	public void bind()
+	{
+		GL10 gl = glGraphics.getGL();
+		
+		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		vertices.position(0);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, vertexSize, vertices);
+		
+		if(hasColor)
+		{
+			gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+			vertices.position(2);
+			gl.glColorPointer(4, GL10.GL_FLOAT, vertexSize, vertices);
+		}
+		if(hasTexCoords)
+		{
+			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			vertices.position(hasColor?6:2);
+			gl.glTexCoordPointer(2, GL10.GL_FLOAT, vertexSize, vertices);
+		}
+	}
+	
+	public void unbind()
+	{
+		GL10 gl = glGraphics.getGL();
+		if(hasTexCoords)
+		{
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		}
+		
+		if(hasColor)
+		{
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+		}
+	}
+	
 	public void draw(int primativeType, int offset, int numVertices)
 	{
 		GL10 gl = glGraphics.getGL();
@@ -143,6 +179,21 @@ public class Vertices {
 		if(hasColor)
 		{
 			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+		}
+	}
+	
+	public void drawOptimal(int primativeType, int offset, int numVertices)
+	{
+		GL10 gl = glGraphics.getGL();
+				
+		if(indices != null)
+		{
+			indices.position(offset);
+			gl.glDrawElements(primativeType, numVertices,  GL10.GL_UNSIGNED_SHORT,  indices);
+		}
+		else
+		{
+			gl.glDrawArrays(primativeType, offset, numVertices);
 		}
 	}
 }
